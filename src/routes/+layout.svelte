@@ -5,10 +5,12 @@
 	import { setupConvex } from 'convex-svelte';
 	import { createSvelteAuthClient } from '@mmailaender/convex-better-auth-svelte/svelte';
 	import { authClient } from '$lib/auth-client';
+	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	setupConvex(PUBLIC_CONVEX_URL);
 	createSvelteAuthClient({ authClient });
 	let { children } = $props();
 </script>
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<Toaster position="top-center" />
 {@render children()}

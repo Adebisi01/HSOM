@@ -3,6 +3,30 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import { superForm } from 'sveltekit-superforms';
+	import { zod4 } from 'sveltekit-superforms/adapters';
+	import { schema } from './schema.js';
+	import { toast } from 'svelte-sonner';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+
+	let { data } = $props();
+
+	const { form, errors, enhance, submitting } = superForm(data.form, {
+		validators: zod4(schema),
+		validationMethod: 'onblur',
+		onUpdated: ({ form: { message } }) => {
+			if (message?.type === 'error') {
+				toast.error(message.text);
+			} else if (message?.type === 'success') {
+				toast.success(message.text);
+				goto(resolve('/home'));
+			}
+		}
+	});
+	// $effect(() => {
+
+	// });
 </script>
 
 <div class="h-screen w-full">
@@ -18,28 +42,63 @@
 			</Card.Action> -->
 			</Card.Header>
 			<Card.Content>
-				<form method="POST">
+				<form method="POST" id="signup-form" use:enhance novalidate>
 					<div class="flex flex-col gap-6">
 						<div class="grid gap-2">
 							<Label for="email">Full name</Label>
-							<Input id="full_name" type="text" placeholder="John doe" required />
+							<Input
+								id="full_name"
+								type="text"
+								placeholder="John doe"
+								name="name"
+								bind:value={$form.name}
+								required
+							/>
+							{#if $errors.name}
+								<span class="text-red-500"> {$errors.name} </span>
+							{/if}
 						</div>
 						<div class="grid gap-2">
 							<Label for="email">Email address</Label>
-							<Input id="email" type="email" placeholder="example@gmail.com" required />
+							<Input
+								id="email"
+								type="email"
+								name="email"
+								placeholder="example@gmail.com"
+								bind:value={$form.email}
+								required
+							/>
+							{#if $errors.email}
+								<span class="text-red-500"> {$errors.email} </span>
+							{/if}
 						</div>
 						<div class="grid gap-2">
 							<Label for="email">Password</Label>
-							<Input id="password" type="password" placeholder="Create a password" required />
+							<Input
+								id="password"
+								type="password"
+								name="password"
+								placeholder="Create a password"
+								bind:value={$form.password}
+								required
+							/>
+							{#if $errors.password}
+								<span class="text-red-500">{$errors.password} </span>
+							{/if}
 						</div>
 						<div class="grid gap-2">
 							<Label for="email">Confirm password</Label>
 							<Input
 								id="confirm_password"
 								type="password"
+								name="confirm_password"
 								placeholder="Confirm your password"
+								bind:value={$form.confirm_password}
 								required
 							/>
+							{#if $errors.password}
+								<span class="text-red-500"> {$errors.confirm_password} </span>
+							{/if}
 						</div>
 						<div class="grid gap-2">
 							<div class="flex items-center gap-1 accent-black">
@@ -54,7 +113,9 @@
 				</form>
 			</Card.Content>
 			<Card.Footer class="flex-col items-start gap-2">
-				<Button type="submit" class="w-full">Sign up</Button>
+				<Button form="signup-form" type="submit" class="w-full"
+					>{$submitting ? 'Signing you up...' : 'Sign up'}</Button
+				>
 				<div class="float-left">
 					<span class="text-sm text-gray-500">Already have an account? </span>
 					<a href="#" class="w-full">Sign-in</a>

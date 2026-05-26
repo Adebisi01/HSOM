@@ -4,7 +4,7 @@
 	import { useQuery } from 'convex-svelte';
 	import { useAuth } from '@mmailaender/convex-better-auth-svelte/svelte';
 
-	let { data } = $props();
+	// let { data } = $props();
 
 	// Auth state store
 	const auth = useAuth();

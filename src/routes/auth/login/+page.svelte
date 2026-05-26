@@ -3,6 +3,18 @@
 	import { Label } from '$lib/components/ui/label/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 	import * as Card from '$lib/components/ui/card/index.js';
+	import { superForm } from 'sveltekit-superforms';
+	import { toast } from 'svelte-sonner';
+	const { data } = $props();
+	const { form, submitting } = superForm(data.form, {
+		onUpdated: ({ form: { message } }) => {
+			if (message.type === 'error') {
+				toast.error(message.text);
+			} else if (message.type === 'success') {
+				toast.success(message.tex);
+			}
+		}
+	});
 </script>
 
 <div class="h-screen w-full">
@@ -18,15 +30,29 @@
 			</Card.Action> -->
 			</Card.Header>
 			<Card.Content>
-				<form>
+				<form method="POST" id="login-form">
 					<div class="flex flex-col gap-6">
 						<div class="grid gap-2">
 							<Label for="email">Email address</Label>
-							<Input id="email" type="email" placeholder="example@gmail.com" required />
+							<Input
+								id="email"
+								type="email"
+								placeholder="example@gmail.com"
+								required
+								name="email"
+								bind:value={$form.email}
+							/>
 						</div>
 						<div class="grid gap-2">
 							<Label for="email">Password</Label>
-							<Input id="password" type="password" placeholder="Enter your password" required />
+							<Input
+								id="password"
+								type="password"
+								name="password"
+								bind:value={$form.password}
+								placeholder="Enter your password"
+								required
+							/>
 						</div>
 
 						<div class="grid gap-2">
@@ -42,7 +68,9 @@
 				</form>
 			</Card.Content>
 			<Card.Footer class="flex-col gap-2">
-				<Button type="submit" class="w-full">Login</Button>
+				<Button form="login-form" type="submit" class="w-full"
+					>{$submitting ? 'Logging you in...' : 'Login'}</Button
+				>
 				<Button variant="outline" class="w-full">Login with Google</Button>
 			</Card.Footer>
 		</Card.Root>
