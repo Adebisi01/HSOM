@@ -5,13 +5,25 @@
 	import * as Card from '$lib/components/ui/card/index.js';
 	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
+	import { zod4 } from 'sveltekit-superforms/adapters';
+	import { loginSchema } from './schema.js';
+	import { authClient } from '$lib/auth-client.js';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+
 	const { data } = $props();
-	const { form, submitting } = superForm(data.form, {
-		onUpdated: ({ form: { message } }) => {
-			if (message.type === 'error') {
-				toast.error(message.text);
-			} else if (message.type === 'success') {
-				toast.success(message.tex);
+	const { form, submitting, enhance } = superForm(data?.form, {
+		validators: zod4(loginSchema),
+		validationMethod: 'onblur',
+		onUpdated: async ({ form }) => {
+			const { data, error } = await authClient.signIn.email({
+				...form.data
+			});
+			if (error && error.message) {
+				toast.error('Invalid credentials');
+			} else if (!error && data.token) {
+				toast.success('Welcome back! Navigating you to the home page');
+				goto(resolve('/home'));
 			}
 		}
 	});
@@ -30,7 +42,7 @@
 			</Card.Action> -->
 			</Card.Header>
 			<Card.Content>
-				<form method="POST" id="login-form">
+				<form method="POST" id="login-form" use:enhance novalidate>
 					<div class="flex flex-col gap-6">
 						<div class="grid gap-2">
 							<Label for="email">Email address</Label>

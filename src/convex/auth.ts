@@ -5,8 +5,9 @@ import type { DataModel } from './_generated/dataModel';
 import { query } from './_generated/server';
 import { betterAuth } from 'better-auth/minimal';
 import authConfig from './auth.config';
+// import { sendmail } from './email';
 
-const siteUrl = process.env.SITE_URL!;
+// const siteUrl = process.env.SITE_URL!;
 
 // The component client has methods needed for integrating Convex with Better Auth,
 // as well as helper methods for general use.
@@ -14,13 +15,24 @@ export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
 	return betterAuth({
-		baseURL: siteUrl,
+		baseURL: 'http://localhost:5173',
 		database: authComponent.adapter(ctx),
 		// Configure simple, non-verified email/password to get started
 		emailAndPassword: {
 			enabled: true,
 			requireEmailVerification: false
 		},
+		// emailVerification: {
+		// 	sendVerificationEmail: async ({ user, url }) => {
+		// 		sendmail({
+		// 			to: user.email,
+		// 			subject: 'Verify your email',
+		// 			html: `<p>Click <a href="${url}">here</a> to verify your email.</p>`
+		// 		});
+		// 	},
+		// 	autoSignInAfterVerification: true,
+		// 	sendOnSignIn: true
+		// },
 		plugins: [
 			// The Convex plugin is required for Convex compatibility
 			convex({ authConfig })

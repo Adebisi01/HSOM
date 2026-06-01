@@ -9,24 +9,26 @@
 	import { toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { authClient } from '$lib/auth-client.js';
 
 	let { data } = $props();
 
 	const { form, errors, enhance, submitting } = superForm(data.form, {
 		validators: zod4(schema),
 		validationMethod: 'onblur',
-		onUpdated: ({ form: { message } }) => {
-			if (message?.type === 'error') {
-				toast.error(message.text);
-			} else if (message?.type === 'success') {
-				toast.success(message.text);
+		onUpdated: async ({ form }) => {
+			const { error, data } = await authClient.signUp.email({
+				...form.data
+			});
+			console.log(error);
+			if (error && error.message) {
+				toast.error(error?.message);
+			} else if (!error && data.token) {
+				toast.success('Welcome to HSOM. Navigating you to the home page');
 				goto(resolve('/home'));
 			}
 		}
 	});
-	// $effect(() => {
-
-	// });
 </script>
 
 <div class="h-screen w-full">
@@ -118,7 +120,7 @@
 				>
 				<div class="float-left">
 					<span class="text-sm text-gray-500">Already have an account? </span>
-					<a href="#" class="w-full">Sign-in</a>
+					<a href={resolve('/auth/login')} class="w-full">Sign-in</a>
 				</div>
 			</Card.Footer>
 		</Card.Root>

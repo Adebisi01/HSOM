@@ -1,7 +1,7 @@
-import { authClient } from '$lib/auth-client';
-import { inspect } from 'util';
+import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ url }) => {
-	const data = await authClient.getSession();
-	console.log(data);
+export const load = async ({ locals, url }) => {
+	if (!locals.token) {
+		redirect(303, `/auth/login?redirectTo=${url.pathname}`);
+	}
 };
