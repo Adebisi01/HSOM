@@ -3,8 +3,8 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 export const POST = async () => {
 	const s3 = new S3Client({
-		endpoint: 'https://s3.us-west-004.backblazeb2.com', // your bucket's endpoint
-		region: 'us-west-004', // 2nd segment of endpoint
+		endpoint: 'https://s3.eu-central-003.backblazeb2.com', // must match your bucket’s cluster
+		region: 'eu-central-003',
 		credentials: {
 			accessKeyId: 'YOUR_KEY_ID', // Backblaze App Key ID
 			secretAccessKey: 'YOUR_APP_KEY' // Backblaze Application Key
